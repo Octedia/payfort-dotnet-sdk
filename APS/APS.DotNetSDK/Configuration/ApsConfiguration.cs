@@ -56,6 +56,11 @@ namespace APS.DotNetSDK.Configuration
             return _apsJsonConfiguration.CustomFormTemplate;
         }
 
+        public string GetMobilePageTemplate()
+        {
+            return _apsJsonConfiguration.MobilePageTemplate;
+        }
+
         public string GetCloseModalJavaScript()
         {
             return _apsJsonConfiguration.CloseModalJavaScript;

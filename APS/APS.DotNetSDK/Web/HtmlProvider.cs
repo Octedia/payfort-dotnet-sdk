@@ -74,6 +74,25 @@ namespace APS.DotNetSDK.Web
             return formPostForReturn;
         }
 
+        public string GetHtmlTokenizationForMobileIntegration(TokenizationRequestCommand command)
+        {
+            var formActionUrl = _apsConfiguration.GetEnvironmentConfiguration().CustomCheckoutActionUrl;
+            var customFormPostTemplate = _apsConfiguration.GetMobilePageTemplate();
+
+            ValidateMandatoryProperties(command);
+
+            command.Signature = CreateSignature(command);
+
+            var properties = typeof(TokenizationRequestCommand).GetProperties();
+
+            var hiddenFieldsFormPost = BuildHiddenFieldsForForm(command, properties);
+            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties);
+
+            var formPostForReturn = string.Format(customFormPostTemplate, formActionUrl, hiddenFieldsFormPost, cardDetailsFields);
+
+            return formPostForReturn;
+        }
+
         public string GetJavaScriptToCloseModal()
         {
             return _apsConfiguration.GetCloseModalJavaScript();
@@ -189,12 +208,33 @@ namespace APS.DotNetSDK.Web
             return hiddenFieldsFormPost.ToString().Trim();
         }
 
+        private static string BuildHiddenCardFieldsForMobileForm(IEnumerable<PropertyInfo> properties)
+        {
+            var hiddenFieldsFormPost = new StringBuilder();
+
+            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_number"));
+            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "expiry_date"));
+            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_security_code"));
+            // We don't currently include the card holder name
+            // hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_holder_name"));
+
+            return hiddenFieldsFormPost.ToString().Trim();
+        }
+
         private static string BuildCardFieldForForm(IEnumerable<PropertyInfo> properties, string labelName, string propertyName)
         {
             var property = properties.First(x => x.GetJsonPropertyName() == propertyName);
 
             var jsonPropertyName = property.GetJsonPropertyName();
             return $"<label>{labelName}</label><br><input name='{jsonPropertyName}' value=\"\"><br>";
+        }
+
+        private static string BuildHiddenCardFieldForMobileForm(IEnumerable<PropertyInfo> properties, string propertyName)
+        {
+            var property = properties.First(x => x.GetJsonPropertyName() == propertyName);
+
+            var jsonPropertyName = property.GetJsonPropertyName();
+            return $"<input type=\"hidden\" name='{jsonPropertyName}' value='{{{jsonPropertyName}}}'><br>";
         }
 
         private void ValidateMandatoryProperties<T>(T command) where T : RequestCommand

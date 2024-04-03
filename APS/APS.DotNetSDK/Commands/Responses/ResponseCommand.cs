@@ -40,6 +40,9 @@ namespace APS.DotNetSDK.Commands.Responses
         
         [JsonPropertyName("processor_response_code")]
         public string ProcessorResponseCode { get; set; }
+
+        [JsonPropertyName("merchant_extra")]
+        public string MerchantExtra { get; set; }
         
         public virtual void ValidateMandatoryProperties()
         {

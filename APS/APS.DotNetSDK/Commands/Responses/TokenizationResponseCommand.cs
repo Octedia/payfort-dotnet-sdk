@@ -132,6 +132,7 @@ namespace APS.DotNetSDK.Commands.Responses
             NumberOfInstallments = responseCommand.NumberOfInstallments;
             PlanCode = responseCommand.PlanCode;
             IssuerCode = responseCommand.IssuerCode;
+            MerchantExtra = responseCommand.MerchantExtra;
         }
 
         internal override string ToAnonymizedJson()
@@ -163,7 +164,8 @@ namespace APS.DotNetSDK.Commands.Responses
                 CustomerCountryCode = this.CustomerCountryCode,
                 NumberOfInstallments = this.NumberOfInstallments,
                 PlanCode = this.PlanCode,
-                IssuerCode = this.IssuerCode
+                IssuerCode = this.IssuerCode,
+                MerchantExtra = this.MerchantExtra
             };
 
             var serialized = JsonSerializer.Serialize(anonymized,

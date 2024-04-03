@@ -20,6 +20,9 @@ namespace APS.DotNetSDK.Configuration
         [JsonPropertyName("CustomFormTemplate")]
         public string CustomFormTemplate { get; set; }
 
+        [JsonPropertyName("MobilePageTemplate")]
+        public string MobilePageTemplate { get; set; }
+
         [JsonPropertyName("CloseModalJavaScript")]
         public string CloseModalJavaScript { get; set; }
 

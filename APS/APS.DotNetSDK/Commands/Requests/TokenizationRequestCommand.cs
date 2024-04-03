@@ -78,6 +78,11 @@ namespace APS.DotNetSDK.Commands.Requests
         /// </summary>
         [JsonPropertyName("customer_country_code")]
         public string CustomerCountryCode { get; set; }
+        [JsonPropertyName("merchant_extra")]
+        /// <summary>
+        /// Extra data sent by merchant. Will be received and sent back as received. Will not be displayed in any report
+        /// </summary>
+        public string MerchantExtra { get; set; }
 
         public override void ValidateMandatoryProperties()
         {

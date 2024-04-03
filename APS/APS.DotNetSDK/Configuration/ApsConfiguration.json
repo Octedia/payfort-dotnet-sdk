@@ -37,6 +37,7 @@
   "RedirectFormTemplate": "<form action='{0}' method='post' name='redirectToApsForm'><br>{1}</form>",
   "StandardFormTemplate": "<iframe name='apsFrame' src='' width='600' height='440'></iframe><br><form action='{0}' method='post' id='apsIframeForm' target='apsFrame'><br>{1}<input value='Place Order' type='submit' id='apsIframeForm'></form>",
   "CustomFormTemplate": "<form action='{0}' method='post' name='redirectToApsForm'><br>{1}<br>{2}<input value='Place Order' type='submit' id='redirectToApsForm'></form>",
+  "MobilePageTemplate": "<!DOCTYPE html> <html> <head> <title>Token Acquisition</title> <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'> </head> <body onload='document.forms[\"tokenization_form\"].submit()'> <form method='post' action='{0}' name='tokenization_form'><br>{1}<br>{2}</form> </body></html>",
   "CloseModalJavaScript": "<script>var myModal = window.parent.document.getElementById('myModal'); if (!(myModal == null)) { myModal.style.display = 'none';}</script>",
   "CloseIframeJavaScript": "<script>var iframe = window.parent.document.getElementById('iframeDiv');if (!(iframe == null)) { iframe.innerHTML = '';}</script>"
 }
