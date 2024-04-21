@@ -47,12 +47,12 @@ namespace APS.DotNetSDK.Web.Installments
         {
         }
 
-        public async Task<GetInstallmentsResponseCommand> GetInstallmentsPlansAsync(GetInstallmentsRequestCommand command)
+        public async Task<GetInstallmentsResponseCommand> GetInstallmentsPlansAsync(GetInstallmentsRequestCommand command, string sdkConfigurationId = null)
         {
-            command.Signature = CalculateSignature(command);
+            command.Signature = CalculateSignature(command, sdkConfigurationId);
             var responseCommand = await SendRequestAsync(command);
 
-            ValidateResponseSignature(responseCommand);
+            ValidateResponseSignature(responseCommand, sdkConfigurationId);
 
             return responseCommand;
         }
@@ -105,32 +105,36 @@ namespace APS.DotNetSDK.Web.Installments
             }
         }
 
-        private string CalculateSignature<TRequest>(TRequest command) where TRequest : GetInstallmentsRequestCommand
+        private string CalculateSignature<TRequest>(TRequest command, string sdkConfigurationId = null) where TRequest : GetInstallmentsRequestCommand
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             _logger.LogDebug($"Starting signature calculation for [RequestObject:{@command.ToAnonymizedJson()}]");
 
-            var signature = _signatureProvider.GetSignature(command, SdkConfiguration.RequestShaPhrase,
-                SdkConfiguration.ShaType);
+            var signature = _signatureProvider.GetSignature(command, sdkConfiguration.RequestShaPhrase,
+                sdkConfiguration.ShaType);
 
             _logger.LogDebug($"Generated signature for [Signature:{signature}]");
 
             return signature;
         }
 
-        private void ValidateResponseSignature<TResponse>(TResponse responseCommand) where TResponse : GetInstallmentsResponseCommand
+        private void ValidateResponseSignature<TResponse>(TResponse responseCommand, string sdkConfigurationId = null) where TResponse : GetInstallmentsResponseCommand
         {
             _logger.LogDebug($"Validate signature for response received from APS [Response:{@responseCommand.ToAnonymizedJson()}]");
 
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             var isResponseSignatureValid = _signatureValidator.ValidateSignature(responseCommand,
-                SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType, responseCommand.Signature);
+                sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType, responseCommand.Signature);
 
             _logger.LogDebug(
                 $"Signature validation is {isResponseSignatureValid} for [Response:{@responseCommand.ToAnonymizedJson()}]");
 
             if (!isResponseSignatureValid)
             {
-                var actualSignature = _signatureProvider.GetSignature(responseCommand, SdkConfiguration.RequestShaPhrase,
-                    SdkConfiguration.ShaType);
+                var actualSignature = _signatureProvider.GetSignature(responseCommand, sdkConfiguration.RequestShaPhrase,
+                    sdkConfiguration.ShaType);
 
                 _logger.LogError($"Signature mismatch when validating the payment gateway response " +
                                  $"Response:{@responseCommand.ToAnonymizedJson()}" +

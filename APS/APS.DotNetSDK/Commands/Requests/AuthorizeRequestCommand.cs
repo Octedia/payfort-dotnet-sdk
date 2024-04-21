@@ -11,10 +11,12 @@ namespace APS.DotNetSDK.Commands.Requests
     {
         private string _rememberMe;
 
-        public AuthorizeRequestCommand()
+        public AuthorizeRequestCommand(string sdkConfigurationId = null)
         {
-            AccessCode = SdkConfiguration.AccessCode;
-            MerchantIdentifier = SdkConfiguration.MerchantIdentifier;
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            AccessCode = sdkConfiguration.AccessCode;
+            MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
         [JsonPropertyName("command")]

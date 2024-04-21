@@ -10,10 +10,12 @@ namespace APS.DotNetSDK.Commands.Requests
     {
         private string _installments;
         private string _rememberMe;
-        public TokenizationRequestCommand()
+        public TokenizationRequestCommand(string sdkConfigurationId = null)
         {
-            AccessCode = SdkConfiguration.AccessCode;
-            MerchantIdentifier = SdkConfiguration.MerchantIdentifier;
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            AccessCode = sdkConfiguration.AccessCode;
+            MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
         [JsonPropertyName("service_command")]
@@ -78,11 +80,18 @@ namespace APS.DotNetSDK.Commands.Requests
         /// </summary>
         [JsonPropertyName("customer_country_code")]
         public string CustomerCountryCode { get; set; }
+        
         [JsonPropertyName("merchant_extra")]
-        /// <summary>
-        /// Extra data sent by merchant. Will be received and sent back as received. Will not be displayed in any report
-        /// </summary>
         public string MerchantExtra { get; set; }
+
+        [JsonPropertyName("merchant_extra1")]
+        public string MerchantExtra1 { get; set; }
+
+        [JsonPropertyName("merchant_extra2")]
+        public string MerchantExtra2 { get; set; }
+
+        [JsonPropertyName("merchant_extra3")]
+        public string MerchantExtra3 { get; set; }
 
         public override void ValidateMandatoryProperties()
         {

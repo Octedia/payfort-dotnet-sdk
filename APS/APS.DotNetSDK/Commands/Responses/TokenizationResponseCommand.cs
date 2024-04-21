@@ -133,6 +133,9 @@ namespace APS.DotNetSDK.Commands.Responses
             PlanCode = responseCommand.PlanCode;
             IssuerCode = responseCommand.IssuerCode;
             MerchantExtra = responseCommand.MerchantExtra;
+            MerchantExtra1 = responseCommand.MerchantExtra1;
+            MerchantExtra2 = responseCommand.MerchantExtra2;
+            MerchantExtra3 = responseCommand.MerchantExtra3;
         }
 
         internal override string ToAnonymizedJson()

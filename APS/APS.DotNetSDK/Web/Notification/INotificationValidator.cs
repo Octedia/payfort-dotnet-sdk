@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace APS.DotNetSDK.Web.Notification
 {
@@ -12,7 +13,17 @@ namespace APS.DotNetSDK.Web.Notification
         /// <returns>The notification validation response</returns>
         /// <exception cref="Exceptions.InvalidNotification"> When the notification is invalid</exception>
         /// <exception cref="Exceptions.SignatureException">Get the exception when there are more than two levels of reference</exception>
-        NotificationValidationResponse Validate(HttpRequest httpRequest);
+        NotificationValidationResponse Validate(HttpRequest httpRequest, string sdkConfigurationId = null);
+
+        /// <summary>
+        /// Extract the necessary information from the Dictionary<string, string>, validate form post
+        /// parameters and signature
+        /// </summary>
+        /// <param name="httpRequest">The HttpRequest received from the gateway</param>
+        /// <returns>The notification validation response</returns>
+        /// <exception cref="Exceptions.InvalidNotification"> When the notification is invalid</exception>
+        /// <exception cref="Exceptions.SignatureException">Get the exception when there are more than two levels of reference</exception>
+        NotificationValidationResponse Validate(Dictionary<string, string> data, string sdkConfigurationId = null);
 
         /// <summary>
         /// Extract the necessary information from the HttpRequest, validate async notification
@@ -22,6 +33,6 @@ namespace APS.DotNetSDK.Web.Notification
         /// <returns>The notification validation response</returns>
         /// <exception cref="Exceptions.InvalidNotification"> When the notification is invalid</exception>
         /// <exception cref="Exceptions.SignatureException">Get the exception when there are more than two levels of reference</exception>
-        NotificationValidationResponse ValidateAsyncNotification(HttpRequest httpRequest);
+        NotificationValidationResponse ValidateAsyncNotification(HttpRequest httpRequest, string sdkConfigurationId = null);
     }
 }

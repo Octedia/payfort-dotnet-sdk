@@ -55,14 +55,14 @@ namespace APS.DotNetSDK.Web
             return BuildHtmlFormPost(command, formActionUrl, iframeFormPostTemplate);
         }
 
-        public string GetHtmlTokenizationForCustomIntegration(TokenizationRequestCommand command)
+        public string GetHtmlTokenizationForCustomIntegration(TokenizationRequestCommand command, string sdkConfigurationId = null)
         {
             var formActionUrl = _apsConfiguration.GetEnvironmentConfiguration().CustomCheckoutActionUrl;
             var customFormPostTemplate = _apsConfiguration.GetCustomFormPostTemplate();
 
             ValidateMandatoryProperties(command);
 
-            command.Signature = CreateSignature(command);
+            command.Signature = CreateSignature(command, sdkConfigurationId);
 
             var properties = typeof(TokenizationRequestCommand).GetProperties();
 
@@ -74,14 +74,14 @@ namespace APS.DotNetSDK.Web
             return formPostForReturn;
         }
 
-        public string GetHtmlTokenizationForMobileIntegration(TokenizationRequestCommand command)
+        public string GetHtmlTokenizationForMobileIntegration(TokenizationRequestCommand command, string sdkConfigurationId = null)
         {
             var formActionUrl = _apsConfiguration.GetEnvironmentConfiguration().CustomCheckoutActionUrl;
             var customFormPostTemplate = _apsConfiguration.GetMobilePageTemplate();
 
             ValidateMandatoryProperties(command);
 
-            command.Signature = CreateSignature(command);
+            command.Signature = CreateSignature(command, sdkConfigurationId);
 
             var properties = typeof(TokenizationRequestCommand).GetProperties();
 
@@ -143,11 +143,12 @@ namespace APS.DotNetSDK.Web
         }
 
         #region private methods
-        private string BuildHtmlFormPost<T>(T command, string formActionUrl, string formPostTemplate) where T : RequestCommand
+        private string BuildHtmlFormPost<T>(T command, string formActionUrl, string formPostTemplate,  string sdkConfigurationId = null)
+            where T : RequestCommand
         {
             ValidateMandatoryProperties(command);
 
-            command.Signature = CreateSignature(command);
+            command.Signature = CreateSignature(command, sdkConfigurationId);
 
             var properties = typeof(T).GetProperties();
 
@@ -157,12 +158,14 @@ namespace APS.DotNetSDK.Web
             return formPostForReturn;
         }
 
-        private string CreateSignature<T>(T command) where T : RequestCommand
+        private string CreateSignature<T>(T command, string sdkConfigurationId = null) where T : RequestCommand
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+            
             _logger.LogInformation($"Starting signature calculation for [MerchantReference:{command.MerchantReference}]");
             _logger.LogDebug($"Starting signature calculation for [MerchantReference:{command.MerchantReference},RequestObject:{@command.ToAnonymizedJson()}]");
 
-            var signature = _signatureProvider.GetSignature(command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ShaType);
+            var signature = _signatureProvider.GetSignature(command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ShaType);
 
             _logger.LogInformation($"Generated signature for [MerchantReference:{command.MerchantReference},Signature:{signature}]");
             return signature;

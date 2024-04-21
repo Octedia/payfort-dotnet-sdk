@@ -42,20 +42,38 @@ namespace APS.DotNetSDK.Web.Notification
         {
         }
 
-        public NotificationValidationResponse Validate(HttpRequest httpRequest)
+        public NotificationValidationResponse Validate(HttpRequest httpRequest, string sdkConfigurationId = null)
         {
             switch (httpRequest.Method)
             {
                 case "POST":
-                    return ValidateFormPost(httpRequest.Form);
+                    return ValidateFormPost(httpRequest.Form, sdkConfigurationId);
                 case "GET":
-                    return ValidateQueryString(httpRequest.QueryString);
+                    return ValidateQueryString(httpRequest.QueryString, sdkConfigurationId);
                 default:
                     throw new InvalidNotification("Notification should be GET or POST");
             }
         }
 
-        public NotificationValidationResponse ValidateAsyncNotification(HttpRequest httpRequest)
+        public NotificationValidationResponse Validate(Dictionary<string, string> data, string sdkConfigurationId = null)
+        {
+            var keyValuePairDictionary = (Dictionary<string, string>)CheckAcquirerResponseCode(data);
+
+            _logger.LogDebug(
+                $"Started to validate the async notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
+
+            var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
+
+            _logger.LogDebug($"Validation is {isValid} for validate request");
+
+            return new NotificationValidationResponse
+            {
+                IsValid = isValid,
+                RequestData = keyValuePairDictionary
+            };
+        }
+
+        public NotificationValidationResponse ValidateAsyncNotification(HttpRequest httpRequest, string sdkConfigurationId = null)
         {
             var stream = new StreamReader(httpRequest.Body);
             var body = stream.ReadToEndAsync().Result;
@@ -67,7 +85,29 @@ namespace APS.DotNetSDK.Web.Notification
             _logger.LogDebug(
                 $"Started to validate the async notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
 
-            var isValid = ValidateRequest(keyValuePairDictionary);
+            var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
+
+            _logger.LogDebug($"Validation is {isValid} for validate request");
+
+            return new NotificationValidationResponse
+            {
+                IsValid = isValid,
+                RequestData = keyValuePairDictionary
+            };
+        }
+
+        public NotificationValidationResponse ValidateJsonBody(HttpRequest httpRequest, string sdkConfigurationId = null)
+        {
+            var streamReader = new StreamReader(httpRequest.Body);
+            var body = streamReader.ReadToEndAsync().Result;
+
+            var keyValuePairDictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(body);
+            keyValuePairDictionary = (Dictionary<string, string>)CheckAcquirerResponseCode(keyValuePairDictionary);
+
+            _logger.LogDebug(
+                $"Started to validate the async notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
+
+            var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
 
             _logger.LogDebug($"Validation is {isValid} for validate request");
 
@@ -79,7 +119,7 @@ namespace APS.DotNetSDK.Web.Notification
         }
 
         #region  private methods
-        private NotificationValidationResponse ValidateFormPost(IFormCollection formCollection)
+        private NotificationValidationResponse ValidateFormPost(IFormCollection formCollection, string sdkConfigurationId = null)
         {
             var keyValuePairDictionary =
                 formCollection.Keys.ToDictionary<string, string, string>(key =>
@@ -90,7 +130,7 @@ namespace APS.DotNetSDK.Web.Notification
             _logger.LogDebug(
                 $"Started to validate the Form Post notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
 
-            var isValid = ValidateRequest(keyValuePairDictionary);
+            var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
 
             _logger.LogDebug($"Validation is {isValid} for validate request");
 
@@ -100,8 +140,8 @@ namespace APS.DotNetSDK.Web.Notification
                 RequestData = keyValuePairDictionary
             };
         }
-        
-        private NotificationValidationResponse ValidateQueryString(QueryString queryString)
+
+        private NotificationValidationResponse ValidateQueryString(QueryString queryString, string sdkConfigurationId = null)
         {
             if (!queryString.HasValue)
             {
@@ -115,7 +155,7 @@ namespace APS.DotNetSDK.Web.Notification
 
             _logger.LogDebug($"Started to validate the Get notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
 
-            var isValid = ValidateRequest(keyValuePairDictionary);
+            var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
 
             _logger.LogDebug($"Validation is {isValid} for validate request");
 
@@ -168,11 +208,11 @@ namespace APS.DotNetSDK.Web.Notification
             return anonymizedDictionary.JoinElements(",");
         }
 
-        private bool ValidateRequest(IDictionary<string, string> keyValuePairDictionary)
+        private bool ValidateRequest(IDictionary<string, string> keyValuePairDictionary, string sdkConfigurationId = null)
         {
             var responseCommand = BuildResponse(keyValuePairDictionary);
 
-            return ValidateResponseSignature(responseCommand);
+            return ValidateResponseSignature(responseCommand, sdkConfigurationId);
         }
 
         private ResponseCommandWithNotification BuildResponse(IDictionary<string, string> keyValuePairDictionary)
@@ -231,12 +271,14 @@ namespace APS.DotNetSDK.Web.Notification
             return null;
         }
 
-        private bool ValidateResponseSignature(ResponseCommandWithNotification responseCommand)
+        private bool ValidateResponseSignature(ResponseCommandWithNotification responseCommand, string sdkConfigurationId = null)
         {
             _logger.LogDebug(
                 $"Validate signature for response received from APS [MerchantReference:{responseCommand.MerchantReference},FortId:{responseCommand.FortId}]");
 
-            var isResponseSignatureValid = _signatureValidator.ValidateSignature(responseCommand, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType,
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            var isResponseSignatureValid = _signatureValidator.ValidateSignature(responseCommand, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType,
                        responseCommand.Signature);
 
             _logger.LogDebug(

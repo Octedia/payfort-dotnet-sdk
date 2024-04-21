@@ -30,7 +30,14 @@ namespace APS.DotNetSDK.Web
         /// </summary>
         /// <param name="command">The requested command</param>
         /// <returns>A string representing the built html form </returns>
-        string GetHtmlTokenizationForCustomIntegration(TokenizationRequestCommand command);
+        string GetHtmlTokenizationForCustomIntegration(TokenizationRequestCommand command, string sdkConfigurationId = null);
+        
+        /// <summary>
+        /// Provides the Html necessary for initiating a mobile custom integration
+        /// </summary>
+        /// <param name="command">The requested command</param>
+        /// <returns>A string representing the built html form </returns>
+        string GetHtmlTokenizationForMobileIntegration(TokenizationRequestCommand command, string sdkConfigurationId = null);
         
         /// <summary>
         /// Provides the JavaScript to close the 3ds modal

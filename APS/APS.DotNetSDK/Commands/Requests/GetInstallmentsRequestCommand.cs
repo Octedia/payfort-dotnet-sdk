@@ -9,10 +9,12 @@ namespace APS.DotNetSDK.Commands.Requests
     {
         private string _language;
 
-        public GetInstallmentsRequestCommand()
+        public GetInstallmentsRequestCommand(string sdkConfigurationId = null)
         {
-            AccessCode = SdkConfiguration.AccessCode;
-            MerchantIdentifier = SdkConfiguration.MerchantIdentifier;
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            AccessCode = sdkConfiguration.AccessCode;
+            MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
         [JsonPropertyName("access_code")]

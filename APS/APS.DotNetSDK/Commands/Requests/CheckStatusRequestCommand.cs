@@ -9,10 +9,12 @@ namespace APS.DotNetSDK.Commands.Requests
     public class CheckStatusRequestCommand : RequestCommand
     {
         private string _returnThirdPartyResponseCodes;
-        public CheckStatusRequestCommand()
+        public CheckStatusRequestCommand(string sdkConfigurationId = null)
         {
-            AccessCode = SdkConfiguration.AccessCode;
-            MerchantIdentifier = SdkConfiguration.MerchantIdentifier;
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            AccessCode = sdkConfiguration.AccessCode;
+            MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
         [JsonPropertyName("query_command")]

@@ -48,62 +48,74 @@ namespace APS.DotNetSDK.Maintenance
         {
         }
 
-        public async Task<AuthorizeResponseCommand> AuthorizeAsync(AuthorizeRequestCommand command)
+        public async Task<AuthorizeResponseCommand> AuthorizeAsync(AuthorizeRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<AuthorizeRequestCommand, AuthorizeResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
         }
 
-        public async Task<PurchaseResponseCommand> PurchaseAsync(PurchaseRequestCommand command)
+        public async Task<PurchaseResponseCommand> PurchaseAsync(PurchaseRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<PurchaseRequestCommand, PurchaseResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
         }
 
         public async Task<ApplePayAuthorizeResponseCommand> AuthorizeAsync(AuthorizeRequestCommand authorizeRequestCommand,
-            ApplePayRequestCommand applePayRequestCommand)
+            ApplePayRequestCommand applePayRequestCommand, string sdkConfigurationId = null)
         {
-            SdkConfiguration.ValidateApplePayConfiguration();
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
-            var requestCommand = new ApplePayAuthorizeRequestCommand(authorizeRequestCommand, applePayRequestCommand);
+            var requestCommand = new ApplePayAuthorizeRequestCommand(authorizeRequestCommand, applePayRequestCommand, sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<ApplePayAuthorizeRequestCommand, ApplePayAuthorizeResponseCommand>(
-                requestCommand, SdkConfiguration.ApplePayConfiguration.RequestShaPhrase, SdkConfiguration.ApplePayConfiguration.ResponseShaPhrase, SdkConfiguration.ApplePayConfiguration.ShaType);
+                requestCommand, sdkConfiguration.ApplePay.RequestShaPhrase, sdkConfiguration.ApplePay.ResponseShaPhrase, sdkConfiguration.ApplePay.ShaType);
         }
 
         public async Task<ApplePayPurchaseResponseCommand> PurchaseAsync(PurchaseRequestCommand purchaseRequestCommand,
-            ApplePayRequestCommand applePayRequestCommand)
+            ApplePayRequestCommand applePayRequestCommand, string sdkConfigurationId = null)
         {
-            SdkConfiguration.ValidateApplePayConfiguration();
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
-            var requestCommand = new ApplePayPurchaseRequestCommand(purchaseRequestCommand, applePayRequestCommand);
+            var requestCommand = new ApplePayPurchaseRequestCommand(purchaseRequestCommand, applePayRequestCommand, sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<ApplePayPurchaseRequestCommand, ApplePayPurchaseResponseCommand>(
-                requestCommand, SdkConfiguration.ApplePayConfiguration.RequestShaPhrase, SdkConfiguration.ApplePayConfiguration.ResponseShaPhrase, SdkConfiguration.ApplePayConfiguration.ShaType);
+                requestCommand, sdkConfiguration.ApplePay.RequestShaPhrase, sdkConfiguration.ApplePay.ResponseShaPhrase, sdkConfiguration.ApplePay.ShaType);
         }
 
-        public async Task<CaptureResponseCommand> CaptureAsync(CaptureRequestCommand command)
+        public async Task<CaptureResponseCommand> CaptureAsync(CaptureRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<CaptureRequestCommand, CaptureResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
         }
 
-        public async Task<VoidResponseCommand> VoidAsync(VoidRequestCommand command)
+        public async Task<VoidResponseCommand> VoidAsync(VoidRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<VoidRequestCommand, VoidResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
         }
 
-        public async Task<RefundResponseCommand> RefundAsync(RefundRequestCommand command)
+        public async Task<RefundResponseCommand> RefundAsync(RefundRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<RefundRequestCommand, RefundResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
         }
 
-        public async Task<CheckStatusResponseCommand> CheckStatusAsync(CheckStatusRequestCommand command)
+        public async Task<CheckStatusResponseCommand> CheckStatusAsync(CheckStatusRequestCommand command, string sdkConfigurationId = null)
         {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             return await SendRequestToPaymentGatewayAsync<CheckStatusRequestCommand, CheckStatusResponseCommand>
-                (command, SdkConfiguration.RequestShaPhrase, SdkConfiguration.ResponseShaPhrase, SdkConfiguration.ShaType, true);
+                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType, true);
         }
 
         public void Dispose()

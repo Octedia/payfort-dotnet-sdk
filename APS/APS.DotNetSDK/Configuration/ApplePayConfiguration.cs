@@ -2,14 +2,54 @@
 using System.Text.Json.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using APS.DotNetSDK.Signature;
+using APS.DotNetSDK.Exceptions;
+using System.Diagnostics;
 
 namespace APS.DotNetSDK.Configuration
 {
     public class ApplePayConfiguration
     {
-        public ApplePayConfiguration(X509Certificate2 securityCertificate)
+        static private X509Certificate2 CreateSecurityCertificate(
+        string appleCertificatePath,
+        string appleCertificatePassword
+    )
         {
-            SecurityCertificate = securityCertificate;
+            Debug.Assert((appleCertificatePath == null && appleCertificatePassword == null)
+                || (appleCertificatePath != null && appleCertificatePassword != null));
+
+            if (appleCertificatePath == null || appleCertificatePassword == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var certificate = new X509Certificate2(appleCertificatePath, appleCertificatePassword);
+            return certificate;
+
+        }
+
+        public ApplePayConfiguration(string AccessCode, string MerchantIdentifier,
+            string DisplayName, string MerchantUid, string ResponseShaPhrase,
+            string RequestShaPhrase, string ShaTypeAsString,
+            string DomainName, string SecurityCertificatePath, string SecurityCertificatePassword)
+        {
+            this.AccessCode = AccessCode;
+            this.MerchantIdentifier = MerchantIdentifier;
+            this.DisplayName = DisplayName;
+            this.MerchantUid = MerchantUid;
+            this.ResponseShaPhrase = ResponseShaPhrase;
+            this.RequestShaPhrase = RequestShaPhrase;
+            this.ShaTypeAsString = ShaTypeAsString;
+            this.DomainName = DomainName;
+            this.SecurityCertificate = CreateSecurityCertificate(SecurityCertificatePath, SecurityCertificatePassword);
+
+            if (!Enum.TryParse(ShaTypeAsString, out ShaType resultApplePayShaType))
+            {
+                //details
+                throw new SdkConfigurationException("Please provide one of the shaType \"Sha512\" or \"Sha256\". " +
+                                                    "Is needed in Apple Pay Configuration. Please check file \"MerchantSdkConfiguration.json\"");
+            }
+
+            ShaType = resultApplePayShaType;
         }
 
         [JsonPropertyName("AccessCode")]
@@ -32,12 +72,18 @@ namespace APS.DotNetSDK.Configuration
 
         [JsonPropertyName("ShaType")]
         public string ShaTypeAsString { get; set; }
-        
+
         [JsonPropertyName("DomainName")]
         public string DomainName { get; set; }
 
         [JsonIgnore]
         public ShaType ShaType { get; set; }
+
+        [JsonPropertyName("SecurityCertificatePath")]
+        public string SecurityCertificatePath { get; set; }
+
+        [JsonPropertyName("SecurityCertificatePassword")]
+        public string SecurityCertificatePassword { get; set; }
 
         public X509Certificate2 SecurityCertificate { get; set; }
 

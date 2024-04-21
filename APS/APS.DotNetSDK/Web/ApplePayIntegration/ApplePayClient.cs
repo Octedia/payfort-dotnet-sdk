@@ -31,20 +31,22 @@ namespace APS.DotNetSDK.Web.ApplePayIntegration
         /// Constructor for ApplePay Client
         /// </summary>
         /// <exception cref="Exceptions.SdkConfigurationException">Get the exception when sdk configuration is not set</exception>
-        public ApplePayClient()
+        public ApplePayClient(string sdkConfigurationId = null)
         {
             var configuration = new ApsConfiguration(SdkConfiguration.IsTestEnvironment);
             _configuration = configuration.GetApplePayConfiguration();
 
             SdkConfiguration.ValidateApplePayConfiguration();
 
-            _apiProxy = new ApiProxy(new HttpClientWrapper(SdkConfiguration.ApplePayConfiguration.SecurityCertificate,
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            _apiProxy = new ApiProxy(new HttpClientWrapper(sdkConfiguration.ApplePay.SecurityCertificate,
                 _configuration.SslProtocol));
 
             _logger = SdkConfiguration.ServiceProvider.GetService<ILogger<ApplePayClient>>();
         }
 
-        public async Task<PaymentSessionResponse> RetrieveMerchantSessionAsync(string url)
+        public async Task<PaymentSessionResponse> RetrieveMerchantSessionAsync(string url, string sdkConfigurationId = null)
         {
             bool result = Uri.TryCreate(url, UriKind.Absolute, out var uri);
             if (result == false || uri.Scheme != Uri.UriSchemeHttps)
@@ -52,12 +54,14 @@ namespace APS.DotNetSDK.Web.ApplePayIntegration
                 throw new ArgumentException("Please provide a valid url with https scheme");
             }
 
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
             var request = new PaymentSessionRequest()
             {
-                MerchantIdentifier = SdkConfiguration.ApplePayConfiguration.MerchantUid,
+                MerchantIdentifier = sdkConfiguration.ApplePay.MerchantUid,
                 Initiative = _configuration.Initiative,
-                InitiativeContext = SdkConfiguration.ApplePayConfiguration.DomainName,
-                DisplayName = SdkConfiguration.ApplePayConfiguration.DisplayName
+                InitiativeContext = sdkConfiguration.ApplePay.DomainName,
+                DisplayName = sdkConfiguration.ApplePay.DisplayName
             };
 
             _logger.LogDebug($"Start retrieving merchant session:[Url:{url}]");
