@@ -16,6 +16,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private CaptureRequestCommand() {}
+
         [JsonPropertyName("command")]
         public string Command => "CAPTURE";
 

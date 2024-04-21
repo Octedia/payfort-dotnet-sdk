@@ -16,6 +16,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private VoidRequestCommand() {}
+
         [JsonPropertyName("command")]
         public string Command => "VOID_AUTHORIZATION";
 

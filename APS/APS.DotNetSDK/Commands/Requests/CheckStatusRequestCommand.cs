@@ -17,6 +17,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private CheckStatusRequestCommand() {}
+
         [JsonPropertyName("query_command")]
         public string Command => "CHECK_STATUS";
 

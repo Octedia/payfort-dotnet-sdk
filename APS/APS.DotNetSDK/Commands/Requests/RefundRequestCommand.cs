@@ -16,6 +16,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private RefundRequestCommand() {}
+
         [JsonPropertyName("command")]
         public string Command => "REFUND";
 

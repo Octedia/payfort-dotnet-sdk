@@ -19,6 +19,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private AuthorizeRequestCommand() {}
+
         [JsonPropertyName("command")]
         public string Command => "AUTHORIZATION";
 

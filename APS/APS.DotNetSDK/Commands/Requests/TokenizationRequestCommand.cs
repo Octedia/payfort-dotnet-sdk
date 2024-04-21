@@ -18,6 +18,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private TokenizationRequestCommand() {}
+
         [JsonPropertyName("service_command")]
         public string Command => "TOKENIZATION";
 

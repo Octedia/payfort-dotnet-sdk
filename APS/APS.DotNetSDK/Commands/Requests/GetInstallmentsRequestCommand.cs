@@ -17,6 +17,8 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
+        private GetInstallmentsRequestCommand() {}
+
         [JsonPropertyName("access_code")]
         public string AccessCode { get; protected set; }
 
