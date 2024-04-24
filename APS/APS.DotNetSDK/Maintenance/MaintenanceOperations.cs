@@ -53,7 +53,7 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<AuthorizeRequestCommand, AuthorizeResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command));
         }
 
         public async Task<PurchaseResponseCommand> PurchaseAsync(PurchaseRequestCommand command, string sdkConfigurationId = null)
@@ -61,7 +61,7 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<PurchaseRequestCommand, PurchaseResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command));
         }
 
         public async Task<ApplePayAuthorizeResponseCommand> AuthorizeAsync(AuthorizeRequestCommand authorizeRequestCommand,
@@ -72,7 +72,7 @@ namespace APS.DotNetSDK.Maintenance
             var requestCommand = new ApplePayAuthorizeRequestCommand(authorizeRequestCommand, applePayRequestCommand, sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<ApplePayAuthorizeRequestCommand, ApplePayAuthorizeResponseCommand>(
-                requestCommand, sdkConfiguration.ApplePay.RequestShaPhrase, sdkConfiguration.ApplePay.ResponseShaPhrase, sdkConfiguration.ApplePay.ShaType);
+                requestCommand, sdkConfiguration.GetResolvedSignatureValues(authorizeRequestCommand));
         }
 
         public async Task<ApplePayPurchaseResponseCommand> PurchaseAsync(PurchaseRequestCommand purchaseRequestCommand,
@@ -83,7 +83,7 @@ namespace APS.DotNetSDK.Maintenance
             var requestCommand = new ApplePayPurchaseRequestCommand(purchaseRequestCommand, applePayRequestCommand, sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<ApplePayPurchaseRequestCommand, ApplePayPurchaseResponseCommand>(
-                requestCommand, sdkConfiguration.ApplePay.RequestShaPhrase, sdkConfiguration.ApplePay.ResponseShaPhrase, sdkConfiguration.ApplePay.ShaType);
+                requestCommand, sdkConfiguration.GetResolvedSignatureValues(purchaseRequestCommand));
         }
 
         public async Task<CaptureResponseCommand> CaptureAsync(CaptureRequestCommand command, string sdkConfigurationId = null)
@@ -91,7 +91,19 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<CaptureRequestCommand, CaptureResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command));
+        }
+
+        public async Task<CaptureResponseCommand> CaptureAsync(ApplePayCaptureRequestCommand command, string sdkConfigurationId = null)
+        {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            return await SendRequestToPaymentGatewayAsync<ApplePayCaptureRequestCommand, CaptureResponseCommand>
+                (command, new SignatureValues(
+                    responseShaPhrase: sdkConfiguration.ApplePay.ResponseShaPhrase,
+                    requestShaPhrase: sdkConfiguration.ApplePay.RequestShaPhrase,
+                    shaType: sdkConfiguration.ShaType
+                ));
         }
 
         public async Task<VoidResponseCommand> VoidAsync(VoidRequestCommand command, string sdkConfigurationId = null)
@@ -99,7 +111,19 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<VoidRequestCommand, VoidResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command));
+        }
+
+        public async Task<VoidResponseCommand> VoidAsync(ApplePayVoidRequestCommand command, string sdkConfigurationId = null)
+        {
+            var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
+
+            return await SendRequestToPaymentGatewayAsync<ApplePayVoidRequestCommand, VoidResponseCommand>
+                (command, new SignatureValues(
+                    responseShaPhrase: sdkConfiguration.ApplePay.ResponseShaPhrase,
+                    requestShaPhrase: sdkConfiguration.ApplePay.RequestShaPhrase,
+                    shaType: sdkConfiguration.ShaType
+                ));
         }
 
         public async Task<RefundResponseCommand> RefundAsync(RefundRequestCommand command, string sdkConfigurationId = null)
@@ -107,7 +131,7 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<RefundRequestCommand, RefundResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command));
         }
 
         public async Task<CheckStatusResponseCommand> CheckStatusAsync(CheckStatusRequestCommand command, string sdkConfigurationId = null)
@@ -115,7 +139,7 @@ namespace APS.DotNetSDK.Maintenance
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
             return await SendRequestToPaymentGatewayAsync<CheckStatusRequestCommand, CheckStatusResponseCommand>
-                (command, sdkConfiguration.RequestShaPhrase, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType, true);
+                (command, sdkConfiguration.GetResolvedSignatureValues(command), true);
         }
 
         public void Dispose()
@@ -137,18 +161,18 @@ namespace APS.DotNetSDK.Maintenance
         }
 
         #region private methods
-        private async Task<TResponse> SendRequestToPaymentGatewayAsync<TRequest, TResponse>(TRequest command, string requestShaPhrase, string responseShaPhrase, ShaType shaType, bool ignoreLogging = false)
+        private async Task<TResponse> SendRequestToPaymentGatewayAsync<TRequest, TResponse>(TRequest command, SignatureValues signatureValues, bool ignoreLogging = false)
             where TRequest : RequestCommand
             where TResponse : ResponseCommand
         {
             ValidateMandatoryProperties(command, ignoreLogging);
 
-            command.Signature = CalculateSignature(command, ignoreLogging, requestShaPhrase, shaType);
+            command.Signature = CalculateSignature(command, ignoreLogging, signatureValues.RequestShaPhrase, signatureValues.ShaType);
 
             var responseCommand = await SendRequestAsync<TRequest, TResponse>(command, ignoreLogging);
 
-            ValidateResponseSignature(responseCommand, requestShaPhrase, responseShaPhrase, shaType, ignoreLogging);
-            
+            ValidateResponseSignature(responseCommand, signatureValues.RequestShaPhrase, signatureValues.ResponseShaPhrase, signatureValues.ShaType, ignoreLogging);
+
             return responseCommand;
         }
 

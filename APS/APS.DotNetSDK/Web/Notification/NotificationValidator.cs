@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using APS.DotNetSDK.Commands.Responses;
 using APS.DotNetSDK.AcquirerResponseMessage;
 using Microsoft.Extensions.DependencyInjection;
+using APS.DotNetSDK.Commands.Responses.ApplePay;
 
 namespace APS.DotNetSDK.Web.Notification
 {
@@ -63,6 +64,24 @@ namespace APS.DotNetSDK.Web.Notification
                 $"Started to validate the async notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
 
             var isValid = ValidateRequest(keyValuePairDictionary, sdkConfigurationId);
+
+            _logger.LogDebug($"Validation is {isValid} for validate request");
+
+            return new NotificationValidationResponse
+            {
+                IsValid = isValid,
+                RequestData = keyValuePairDictionary
+            };
+        }
+
+        public NotificationValidationResponse ValidateApplePay(Dictionary<string, string> data, string sdkConfigurationId = null)
+        {
+            var keyValuePairDictionary = (Dictionary<string, string>)CheckAcquirerResponseCode(data);
+
+            _logger.LogDebug(
+                $"Started to validate the async notification received from payment gateway:[{@ToAnonymized(keyValuePairDictionary)}]");
+
+            var isValid = ValidateApplePayRequest(keyValuePairDictionary, sdkConfigurationId);
 
             _logger.LogDebug($"Validation is {isValid} for validate request");
 
@@ -208,6 +227,13 @@ namespace APS.DotNetSDK.Web.Notification
             return anonymizedDictionary.JoinElements(",");
         }
 
+        private bool ValidateApplePayRequest(IDictionary<string, string> keyValuePairDictionary, string sdkConfigurationId = null)
+        {
+            var responseCommand = BuildApplePayResponse(keyValuePairDictionary);
+
+            return ValidateResponseSignature(responseCommand, sdkConfigurationId);
+        }
+
         private bool ValidateRequest(IDictionary<string, string> keyValuePairDictionary, string sdkConfigurationId = null)
         {
             var responseCommand = BuildResponse(keyValuePairDictionary);
@@ -215,11 +241,30 @@ namespace APS.DotNetSDK.Web.Notification
             return ValidateResponseSignature(responseCommand, sdkConfigurationId);
         }
 
+        private ResponseCommandWithNotification BuildApplePayResponse(IDictionary<string, string> keyValuePairDictionary)
+        {
+            _logger.LogInformation($"Started to build the received notification: [{@ToAnonymized(keyValuePairDictionary)}]");
+
+            var responseCommand = new ApplePayAuthorizeResponseCommand();
+            responseCommand.BuildNotificationCommand(keyValuePairDictionary);
+
+            _logger.LogInformation(
+                $"Object response received from the gateway for:[MerchantReference:{responseCommand.MerchantReference},FortId:{responseCommand.FortId}]");
+
+            _logger.LogDebug($"Object response received from the gateway for:[MerchantReference:{responseCommand.MerchantReference}" +
+                $",Response:{@responseCommand.ToAnonymizedJson()}]");
+
+            _logger.LogInformation(
+                $"Successfully build the received notification for: [MerchantReference:{responseCommand.MerchantReference},FortId:{responseCommand.FortId}]");
+
+            return responseCommand;
+        }
+
         private ResponseCommandWithNotification BuildResponse(IDictionary<string, string> keyValuePairDictionary)
         {
             _logger.LogInformation($"Started to build the received notification: [{@ToAnonymized(keyValuePairDictionary)}]");
 
-            ResponseCommandWithNotification responseCommand = BuildResponseCommand(keyValuePairDictionary);
+            var responseCommand = BuildResponseCommand(keyValuePairDictionary);
 
             _logger.LogInformation(
                 $"Object response received from the gateway for:[MerchantReference:{responseCommand.MerchantReference},FortId:{responseCommand.FortId}]");
@@ -248,6 +293,7 @@ namespace APS.DotNetSDK.Web.Notification
                 if (responseCommandItem.Command == commandName)
                 {
                     responseCommandItem.BuildNotification(keyValuePairDictionary);
+
                     return responseCommandItem;
                 }
             }
@@ -271,14 +317,35 @@ namespace APS.DotNetSDK.Web.Notification
             return null;
         }
 
-        private bool ValidateResponseSignature(ResponseCommandWithNotification responseCommand, string sdkConfigurationId = null)
+        private bool ValidateResponseSignature(
+            ResponseCommandWithNotification responseCommand,
+            string sdkConfigurationId = null)
         {
             _logger.LogDebug(
                 $"Validate signature for response received from APS [MerchantReference:{responseCommand.MerchantReference},FortId:{responseCommand.FortId}]");
 
             var sdkConfiguration = SdkConfiguration.GetSdkConfiguration(sdkConfigurationId);
 
-            var isResponseSignatureValid = _signatureValidator.ValidateSignature(responseCommand, sdkConfiguration.ResponseShaPhrase, sdkConfiguration.ShaType,
+            string responseShaPhrase;
+            ShaType shaType;
+            if (responseCommand.CheckIfApplePayCommand())
+            {
+                var applePay = sdkConfiguration.ApplePay;
+                if (applePay == null)
+                {
+                    throw new NotSupportedException();
+                }
+
+                responseShaPhrase = applePay.ResponseShaPhrase;
+                shaType = applePay.ShaType;
+            }
+            else
+            {
+                responseShaPhrase = sdkConfiguration.ResponseShaPhrase;
+                shaType = sdkConfiguration.ShaType;
+            }
+
+            var isResponseSignatureValid = _signatureValidator.ValidateSignature(responseCommand, responseShaPhrase, shaType,
                        responseCommand.Signature);
 
             _logger.LogDebug(

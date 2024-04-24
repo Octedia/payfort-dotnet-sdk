@@ -25,6 +25,8 @@ namespace APS.DotNetSDK.Web.Notification
         /// <exception cref="Exceptions.SignatureException">Get the exception when there are more than two levels of reference</exception>
         NotificationValidationResponse Validate(Dictionary<string, string> data, string sdkConfigurationId = null);
 
+        NotificationValidationResponse ValidateApplePay(Dictionary<string, string> data, string sdkConfigurationId = null);
+
         /// <summary>
         /// Extract the necessary information from the HttpRequest, validate async notification
         /// Use this when the payment process is interrupt

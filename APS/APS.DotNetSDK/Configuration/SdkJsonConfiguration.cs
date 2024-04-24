@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
+using APS.DotNetSDK.Commands;
 using APS.DotNetSDK.Exceptions;
 using APS.DotNetSDK.Signature;
 
@@ -47,6 +49,24 @@ namespace APS.DotNetSDK.Configuration
         [JsonPropertyName("ApplePay")]
         public ApplePayConfiguration ApplePay { get; set; }
 
+        public SignatureValues GetResolvedSignatureValues(Command command)
+        {
+            if (command.CheckIfApplePayCommand())
+            {
+                Debug.Assert(ApplePay != null);
+
+                return new SignatureValues(
+                    ApplePay.ResponseShaPhrase,
+                    ApplePay.RequestShaPhrase,
+                    ApplePay.ShaType);
+            }
+
+            return new SignatureValues(
+                ResponseShaPhrase,
+                RequestShaPhrase,
+                ShaType);
+        }
+
         public void Validate()
         {
             if (string.IsNullOrEmpty(AccessCode))
@@ -71,6 +91,28 @@ namespace APS.DotNetSDK.Configuration
 
             ApplePay?.Validate();
         }
+    }
+
+    public class SignatureValues
+    {
+        public SignatureValues(
+            string responseShaPhrase,
+            string requestShaPhrase,
+            ShaType shaType)
+        {
+            ResponseShaPhrase = responseShaPhrase;
+            RequestShaPhrase = requestShaPhrase;
+            ShaType = shaType;
+        }
+
+        [JsonPropertyName("ResponseShaPhrase")]
+        public string ResponseShaPhrase { get; set; }
+
+        [JsonPropertyName("RequestShaPhrase")]
+        public string RequestShaPhrase { get; set; }
+
+        [JsonIgnore]
+        public ShaType ShaType { get; set; }
     }
 }
 

@@ -60,6 +60,8 @@ namespace APS.DotNetSDK.Maintenance
         /// <exception cref="Exception">Get the exception when there is an issue to the payment gateway</exception>
         Task<CaptureResponseCommand> CaptureAsync(CaptureRequestCommand command, string sdkConfigurationId = null);
 
+        Task<CaptureResponseCommand> CaptureAsync(ApplePayCaptureRequestCommand command, string sdkConfigurationId = null);
+
         /// <summary>
         /// An operation that allows the Merchant to cancel the authorized amount after a successful authorize request
         /// </summary>

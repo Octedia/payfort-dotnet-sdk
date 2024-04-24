@@ -13,7 +13,7 @@ namespace APS.DotNetSDK.Commands.Requests.ApplePay
         [JsonPropertyName("header")]
         public ApplePayPaymentHeader Header { get; set; }
 
-        [JsonPropertyName("version")]
-        public string Version { get; set; }
+        // [JsonPropertyName("version")]
+        // public string Version { get; set; }
     }
 }

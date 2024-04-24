@@ -13,7 +13,8 @@ namespace APS.DotNetSDK.Signature
     {
         public string GetSignature<T>(T input, string shaPhrase, ShaType shaType) where T : Command
         {
-            var hash = GetHashSha(PrepareSignature(input, shaPhrase), shaType);
+            var stringValue = PrepareSignature(input, shaPhrase);
+            var hash = GetHashSha(stringValue, shaType);
             return hash;
         }
 

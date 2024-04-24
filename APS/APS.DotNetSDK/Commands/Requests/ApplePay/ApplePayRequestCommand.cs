@@ -50,11 +50,11 @@ namespace APS.DotNetSDK.Commands.Requests.ApplePay
                     "Data.PaymentData.Signature is mandatory");
             }
 
-            if (string.IsNullOrEmpty(Data.PaymentData.Version))
-            {
-                throw new ArgumentNullException($"Data.PaymentData.Version",
-                    "Data.PaymentData.Version is mandatory");
-            }
+            // if (string.IsNullOrEmpty(Data.PaymentData.Version))
+            // {
+            //     throw new ArgumentNullException($"Data.PaymentData.Version",
+            //         "Data.PaymentData.Version is mandatory");
+            // }
 
             if (Data.PaymentMethod == null)
             {
