@@ -18,7 +18,7 @@ namespace APS.DotNetSDK.Commands.Responses
         public override string Command => "AUTHORIZATION";
 
         [JsonPropertyName("amount")]
-        public double Amount { get; set; }
+        public string Amount { get; set; }
 
         [JsonPropertyName("currency")]
         public string Currency { get; set; }

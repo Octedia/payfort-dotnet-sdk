@@ -55,7 +55,7 @@ namespace APS.DotNetSDK.Commands.Responses
         /// This is only for installments
         /// </summary>
         [JsonPropertyName("amount")]
-        public double? Amount { get; set; }
+        public string Amount { get; set; }
         /// <summary>
         /// This is only for installments
         /// </summary>

@@ -15,13 +15,16 @@ namespace APS.DotNetSDK.Commands.Responses
         public override string Command => "CAPTURE";
 
         [JsonPropertyName("amount")]
-        public double Amount { get; set; }
+        public string Amount { get; set; }
 
         [JsonPropertyName("currency")]
         public string Currency { get; set; }
 
         [JsonPropertyName("order_description")]
         public string Description { get; set; }
+        
+        [JsonPropertyName("acquirer_response_code")]
+        public string AcquirerResponseCode { get; set; }
 
         public override void BuildNotificationCommand(IDictionary<string, string> dictionaryObject)
         {
@@ -63,6 +66,7 @@ namespace APS.DotNetSDK.Commands.Responses
             Amount = responseCommand.Amount;
             Currency = responseCommand.Currency;
             Description = responseCommand.Description;
+            AcquirerResponseCode = responseCommand.AcquirerResponseCode;
         }
 
         internal override string ToAnonymizedJson()
@@ -85,7 +89,8 @@ namespace APS.DotNetSDK.Commands.Responses
 
                 Amount = this.Amount,
                 Currency = this.Currency,
-                Description = this.Description
+                Description = this.Description,
+                AcquirerResponseCode = this.Description
             };
 
             var serialized = JsonSerializer.Serialize(anonymized,

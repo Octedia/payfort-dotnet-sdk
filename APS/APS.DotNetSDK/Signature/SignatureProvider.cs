@@ -6,15 +6,25 @@ using APS.DotNetSDK.Commands;
 using APS.DotNetSDK.Exceptions;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Logging;
+using APS.DotNetSDK.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace APS.DotNetSDK.Signature
 {
     public class SignatureProvider : ISignatureProvider
     {
+        public SignatureProvider() {
+            _logger = SdkConfiguration.ServiceProvider.GetService<ILogger<SignatureProvider>>();
+        }
+
+        private readonly ILogger<SignatureProvider> _logger;
+        
         public string GetSignature<T>(T input, string shaPhrase, ShaType shaType) where T : Command
         {
             var stringValue = PrepareSignature(input, shaPhrase);
             var hash = GetHashSha(stringValue, shaType);
+            _logger.LogDebug("Calculated singature for [stringValue:{stringValue},hash:{hash}]", stringValue, hash);
             return hash;
         }
 

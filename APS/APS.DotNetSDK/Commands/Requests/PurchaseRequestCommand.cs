@@ -25,7 +25,7 @@ namespace APS.DotNetSDK.Commands.Requests
         public string Command => "PURCHASE";
 
         [JsonPropertyName("amount")]
-        public double Amount { get; set; }
+        public string Amount { get; set; }
 
         [JsonPropertyName("currency")]
         public string Currency { get; set; }
@@ -472,7 +472,7 @@ namespace APS.DotNetSDK.Commands.Requests
                 throw new ArgumentNullException($"MerchantReference", "MerchantReference is mandatory");
             }
 
-            if (Amount <= 0)
+            if (string.IsNullOrWhiteSpace(Amount))
             {
                 throw new ArgumentNullException($"Amount", "Amount is mandatory");
             }

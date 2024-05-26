@@ -71,7 +71,7 @@ namespace APS.DotNetSDK.Commands.Requests
         /// This is only for installments
         /// </summary>
         [JsonPropertyName("amount")]
-        public double? Amount { get; set; }
+        public string Amount { get; set; }
         /// <summary>
         /// This is only for installments
         /// </summary>
@@ -124,7 +124,7 @@ namespace APS.DotNetSDK.Commands.Requests
 
         public void ValidateMandatoryPropertiesInstallments()
         {
-            if (Amount <= 0 || Amount == null)
+            if (string.IsNullOrWhiteSpace(Amount))
             {
                 throw new ArgumentNullException($"Amount", "Amount is mandatory for installments");
             }

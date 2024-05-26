@@ -17,6 +17,9 @@ namespace APS.DotNetSDK.Commands.Responses
         [JsonPropertyName("order_description")]
         public string Description { get; set; }
 
+        [JsonPropertyName("acquirer_response_code")]
+        public string AcquirerResponseCode { get; set; }
+
         public override void BuildNotificationCommand(IDictionary<string, string> dictionaryObject)
         {
             if (!dictionaryObject.Keys.Contains(CommandKey))
@@ -54,6 +57,7 @@ namespace APS.DotNetSDK.Commands.Responses
             ProcessorResponseCode = responseCommand.ProcessorResponseCode;
 
             Description = responseCommand.Description;
+            AcquirerResponseCode = responseCommand.AcquirerResponseCode;
         }
 
         internal override string ToAnonymizedJson()
@@ -73,7 +77,8 @@ namespace APS.DotNetSDK.Commands.Responses
 
                 MerchantReference = this.MerchantReference,
                 FortId = this.FortId,
-                Description = this.Description
+                Description = this.Description,
+                AcquirerResponseCode = this.AcquirerResponseCode
             };
 
             var serialized = JsonSerializer.Serialize(anonymized,
