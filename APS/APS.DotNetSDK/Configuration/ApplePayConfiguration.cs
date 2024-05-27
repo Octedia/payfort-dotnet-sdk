@@ -40,7 +40,9 @@ namespace APS.DotNetSDK.Configuration
             this.RequestShaPhrase = RequestShaPhrase;
             this.ShaTypeAsString = ShaTypeAsString;
             this.DomainName = DomainName;
-            this.SecurityCertificate = CreateSecurityCertificate(SecurityCertificatePath, SecurityCertificatePassword);
+            if (SecurityCertificatePath != null) {
+                this.SecurityCertificate = CreateSecurityCertificate(SecurityCertificatePath, SecurityCertificatePassword);
+            }
 
             if (!Enum.TryParse(ShaTypeAsString, out ShaType resultApplePayShaType))
             {
