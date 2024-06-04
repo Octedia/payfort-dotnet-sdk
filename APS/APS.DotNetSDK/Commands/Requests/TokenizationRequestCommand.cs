@@ -95,6 +95,9 @@ namespace APS.DotNetSDK.Commands.Requests
         [JsonPropertyName("merchant_extra3")]
         public string MerchantExtra3 { get; set; }
 
+        [JsonPropertyName("merchant_extra4")]
+        public string MerchantExtra4 { get; set; }
+
         public override void ValidateMandatoryProperties()
         {
             base.ValidateMandatoryProperties();
@@ -155,7 +158,12 @@ namespace APS.DotNetSDK.Commands.Requests
                 Installments = this.Installments,
                 Amount = this.Amount,
                 Currency = this.Currency,
-                CustomerCountryCode = this.CustomerCountryCode
+                CustomerCountryCode = this.CustomerCountryCode,
+                MerchantExtra = this.MerchantExtra,
+                MerchantExtra1 = this.MerchantExtra1,
+                MerchantExtra2 = this.MerchantExtra2,
+                MerchantExtra3 = this.MerchantExtra3,
+                MerchantExtra4 = this.MerchantExtra4,
             };
 
             var serialized = JsonSerializer.Serialize(anonymized,

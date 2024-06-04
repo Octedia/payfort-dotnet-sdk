@@ -136,6 +136,7 @@ namespace APS.DotNetSDK.Commands.Responses
             MerchantExtra1 = responseCommand.MerchantExtra1;
             MerchantExtra2 = responseCommand.MerchantExtra2;
             MerchantExtra3 = responseCommand.MerchantExtra3;
+            MerchantExtra4 = responseCommand.MerchantExtra4;
         }
 
         internal override string ToAnonymizedJson()
@@ -168,7 +169,11 @@ namespace APS.DotNetSDK.Commands.Responses
                 NumberOfInstallments = this.NumberOfInstallments,
                 PlanCode = this.PlanCode,
                 IssuerCode = this.IssuerCode,
-                MerchantExtra = this.MerchantExtra
+                MerchantExtra = this.MerchantExtra,
+                MerchantExtra1 = this.MerchantExtra1,
+                MerchantExtra2 = this.MerchantExtra2,
+                MerchantExtra3 = this.MerchantExtra3,
+                MerchantExtra4 = this.MerchantExtra4
             };
 
             var serialized = JsonSerializer.Serialize(anonymized,

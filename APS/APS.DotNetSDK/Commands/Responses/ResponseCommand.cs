@@ -52,6 +52,9 @@ namespace APS.DotNetSDK.Commands.Responses
 
         [JsonPropertyName("merchant_extra3")]
         public string MerchantExtra3 { get; set; }
+
+        [JsonPropertyName("merchant_extra4")]
+        public string MerchantExtra4 { get; set; }
         
         public virtual void ValidateMandatoryProperties()
         {
