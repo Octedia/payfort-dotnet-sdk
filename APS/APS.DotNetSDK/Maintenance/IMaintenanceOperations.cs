@@ -71,6 +71,8 @@ namespace APS.DotNetSDK.Maintenance
         /// <exception cref="Exception">Get the exception when there is an issue to the payment gateway</exception>
         Task<VoidResponseCommand> VoidAsync(VoidRequestCommand command, string sdkConfigurationId = null);
 
+        Task<VoidResponseCommand> VoidAsync(ApplePayVoidRequestCommand command, string sdkConfigurationId = null);
+
         /// <summary>
         /// An operation that allows the Merchant to return the entire amount of a transaction, or to return a part of it
         /// </summary>
