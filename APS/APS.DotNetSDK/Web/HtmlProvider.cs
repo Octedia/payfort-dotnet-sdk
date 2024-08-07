@@ -93,6 +93,25 @@ namespace APS.DotNetSDK.Web
             return formPostForReturn;
         }
 
+        public string GetHtmlCreateTokenForMobileIntegration(CreateTokenRequestCommand command, string sdkConfigurationId = null)
+        {
+            var formActionUrl = _apsConfiguration.GetEnvironmentConfiguration().CustomCheckoutActionUrl;
+            var customFormPostTemplate = _apsConfiguration.GetMobilePageTemplate();
+
+            ValidateMandatoryProperties(command);
+
+            command.Signature = CreateSignature(command, sdkConfigurationId);
+
+            var properties = typeof(CreateTokenRequestCommand).GetProperties();
+
+            var hiddenFieldsFormPost = BuildHiddenFieldsForForm(command, properties);
+            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties);
+
+            var formPostForReturn = string.Format(customFormPostTemplate, formActionUrl, hiddenFieldsFormPost, cardDetailsFields);
+
+            return formPostForReturn;
+        }
+
         public string GetJavaScriptToCloseModal()
         {
             return _apsConfiguration.GetCloseModalJavaScript();
