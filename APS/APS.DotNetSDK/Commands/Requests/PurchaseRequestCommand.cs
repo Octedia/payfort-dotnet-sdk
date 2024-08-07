@@ -19,7 +19,7 @@ namespace APS.DotNetSDK.Commands.Requests
             MerchantIdentifier = sdkConfiguration.MerchantIdentifier;
         }
 
-        private PurchaseRequestCommand() {}
+        protected PurchaseRequestCommand() {}
 
         [JsonPropertyName("command")]
         public string Command => "PURCHASE";
