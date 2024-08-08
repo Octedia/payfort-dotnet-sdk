@@ -86,7 +86,8 @@ namespace APS.DotNetSDK.Web
             var properties = typeof(TokenizationRequestCommand).GetProperties();
 
             var hiddenFieldsFormPost = BuildHiddenFieldsForForm(command, properties);
-            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties);
+            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties,
+                new string[3] {"card_number", "expiry_date", "card_security_code"});
 
             var formPostForReturn = string.Format(customFormPostTemplate, formActionUrl, hiddenFieldsFormPost, cardDetailsFields);
 
@@ -105,7 +106,8 @@ namespace APS.DotNetSDK.Web
             var properties = typeof(CreateTokenRequestCommand).GetProperties();
 
             var hiddenFieldsFormPost = BuildHiddenFieldsForForm(command, properties);
-            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties);
+            var cardDetailsFields = BuildHiddenCardFieldsForMobileForm(properties, 
+                new string[2] {"card_number", "expiry_date"});
 
             var formPostForReturn = string.Format(customFormPostTemplate, formActionUrl, hiddenFieldsFormPost, cardDetailsFields);
 
@@ -230,15 +232,14 @@ namespace APS.DotNetSDK.Web
             return hiddenFieldsFormPost.ToString().Trim();
         }
 
-        private static string BuildHiddenCardFieldsForMobileForm(IEnumerable<PropertyInfo> properties)
+        private static string BuildHiddenCardFieldsForMobileForm(IEnumerable<PropertyInfo> properties, 
+            string[] propertyNames)
         {
             var hiddenFieldsFormPost = new StringBuilder();
 
-            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_number"));
-            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "expiry_date"));
-            hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_security_code"));
-            // We don't currently include the card holder name
-            // hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, "card_holder_name"));
+            foreach (var name in propertyNames) {
+                hiddenFieldsFormPost.Append(BuildHiddenCardFieldForMobileForm(properties, name));
+            }
 
             return hiddenFieldsFormPost.ToString().Trim();
         }

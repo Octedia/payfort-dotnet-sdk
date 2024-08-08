@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Encodings.Web;
 using APS.DotNetSDK.Configuration;
 using System.Text.Json.Serialization;
+using APS.DotNetSDK.Utils;
 
 namespace APS.DotNetSDK.Commands.Requests
 {
@@ -52,6 +53,7 @@ namespace APS.DotNetSDK.Commands.Requests
         /// This is only for custom checkout (optional parameter). Should be "YES" or "NO"
         /// </summary>
         [JsonPropertyName("remember_me")]
+        [IgnoreOnSignatureCalculationAttribute(true)]
         public string RememberMe
         {
             get => _rememberMe?.ToUpper();
