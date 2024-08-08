@@ -19,7 +19,7 @@ namespace APS.DotNetSDK.Commands.Requests
         private CreateTokenRequestCommand() { }
 
         [JsonPropertyName("service_command")]
-        public string Command => "Create_Token";
+        public string Command => "CREATE_TOKEN";
 
         [JsonPropertyName("token_name")]
         public string TokenName { get; set; }

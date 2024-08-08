@@ -13,7 +13,7 @@ namespace APS.DotNetSDK.Commands.Responses
         private const string CommandKey = "service_command";
 
         [JsonPropertyName("service_command")]
-        public override string Command => "Create_Token";
+        public override string Command => "CREATE_TOKEN";
 
         [JsonPropertyName("expiry_date")]
         public string ExpiryDate { get; set; }
