@@ -244,8 +244,15 @@ namespace APS.DotNetSDK.Web.Notification
         private ResponseCommandWithNotification BuildApplePayResponse(IDictionary<string, string> keyValuePairDictionary)
         {
             _logger.LogInformation($"Started to build the received notification: [{@ToAnonymized(keyValuePairDictionary)}]");
-
-            var responseCommand = new ApplePayAuthorizeResponseCommand();
+            
+            ResponseCommandWithNotification responseCommand;
+            if (keyValuePairDictionary["command"] == "AUTHORIZATION") {
+                responseCommand = new ApplePayAuthorizeResponseCommand();
+            } else if (keyValuePairDictionary["command"] == "PURCHASE") {
+                responseCommand = new ApplePayPurchaseResponseCommand();
+            } else {
+                throw new NotSupportedException("command not supported");
+            }
             responseCommand.BuildNotificationCommand(keyValuePairDictionary);
 
             _logger.LogInformation(
