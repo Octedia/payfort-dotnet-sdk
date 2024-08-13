@@ -44,7 +44,7 @@ namespace APS.DotNetSDK.Logging
 
             serviceCollection.AddLogging(builder =>
             {
-                builder.ClearProviders();
+                // builder.ClearProviders();
                 builder.AddSerilog(logger);
             });
         }
